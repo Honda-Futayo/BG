@@ -1,4 +1,4 @@
-$(function() {
+$(() => {
     // 1.昵称的表单验证
     let form = layui.form
 

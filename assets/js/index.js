@@ -1,24 +1,23 @@
 $(() => {
-        getUserinfo()
-            // 3.实现退出功能
-            // 3.1点击退出按钮实现退出功能
-        $('#btnLogout').click(() => {
-            layer.confirm('确定退出登录?', { icon: 3, title: '提示' }, function(index) {
-                //do something
-                // 3.2. 清空本地存储中的 token
-                localStorage.removeItem('token')
+    getUserinfo()
+        // 3.实现退出功能
+        // 3.1点击退出按钮实现退出功能
+    $('#btnLogout').click(() => {
+        layer.confirm('确定退出登录?', { icon: 3, title: '提示' }, function(index) {
+            //do something
+            // 3.2. 清空本地存储中的 token
+            localStorage.removeItem('token')
 
-                // 3.3. 重新跳转到登录页面
-                location.href = '/login.html'
+            // 3.3. 重新跳转到登录页面
+            location.href = '/login.html'
 
-                // 3.4关闭 confirm 询问框
-                layer.close(index);
-            });
-        })
+            // 3.4关闭 confirm 询问框
+            layer.close(index);
+        });
     })
-    // 1.定义获取用户信息的函数 getUserinfo 函数
+})
 
-
+// 1.定义获取用户信息的函数 getUserinfo 函数
 function getUserinfo() {
     // 1.1发起get请求
     $.ajax({
