@@ -1,5 +1,7 @@
 $(function() {
-    // 1.使用模板引擎渲染选择文章类别的下拉选择框
+    let url_data = location.search
+    let abc = null
+        // 1.使用模板引擎渲染选择文章类别的下拉选择框
     initxiaL()
 
     function initxiaL() {
@@ -76,6 +78,7 @@ $(function() {
         state1 = '草稿'
     })
 
+
     // 4.2为表单绑定 submit 提交事件
     $('#wZ-form').on('submit', function(e) {
         //  阻止表单的默认提交行为
@@ -86,6 +89,8 @@ $(function() {
 
         //  将文章的发布状态，存到 fd 中
         fd.append('state', state1)
+
+
 
         // 将封面裁剪过后的图片，输出为一个文件对象
         $image
@@ -98,23 +103,26 @@ $(function() {
                 // 将 Canvas 画布上的内容，转化为文件对象
                 // 得到文件对象后，进行后续的操作
                 //  将文件对象，存储到 fd 中
-                console.log(blob);
                 fd.append('cover_img', blob)
 
                 //  发起 ajax 数据请求
-                tiJiao(fd)
+                if (abc) {
+                    fd.append('Id', abc)
+                    chongX(fd)
+                } else {
+                    console.log(1);
+                    tiJiao(fd)
+                }
+
             })
-
-
     });
 
 
-    let url_data = location.search
-    let aaa = null
+
     if (url_data.length > 0) {
         url_data = url_data.substr(1).split('=')[1]
 
-        // 发起ajax请求
+        // 发起ajax请求渲染数据
         $.ajax({
             type: "get",
             url: "/my/article/" + url_data,
@@ -123,16 +131,44 @@ $(function() {
                 console.log(res);
                 layui.form.val("formTest", res.data);
                 console.log(res.data.cate_id);
-                // $.ajax({
-                //     type: "get",
-                //     url: "/my/article/cates",
-                //     success: function(r) {
-                //         console.log(r);
-                //     }
-                // });
-                // $('#image').attr('src', res.data.cover_img)
+                $.ajax({
+                    type: "get",
+                    url: "/my/article/cates/" + res.data.cate_id,
+                    success: function(r) {
+                        let obj = document.getElementById('sel-sel');
+                        $.each(obj.options, function(i, n) {
+                            if (n.innerHTML == r.data.name) {
+                                n.selected = true;
+                                layui.form.render()
+                                abc = r.data.Id
+                            }
+                        });
+                    }
+                });
+                $image
+                    .cropper('destroy') // 销毁旧的裁剪区域
+                    .attr('src', 'http://ajax.frontend.itheima.net' + res.data.cover_img) // 重新设置图片路径
+                    .cropper(options) // 重新初始化裁剪区域
             }
         });
+
     }
+
+    function chongX(fd) {
+        $.ajax({
+            type: "post",
+            url: "/my/article/edit",
+            data: fd,
+            contentType: false,
+            processData: false,
+            success: function(res) {
+                if (res.status !== 0) return layui.layer.msg('发布文章失败！')
+                layui.layer.msg('发布文章成功！')
+
+                // 发布文章成功后，跳转到文章列表页面
+                location.href = '/article/art_list.html'
+            }
+        });
+    };
 
 })
